@@ -152,7 +152,7 @@ export class MazeServer extends EventEmitter {
   async #onSocket(socket: Socket) {
     const clientSocket = new ClientSocket(socket) // Lets create a ClientSocket instance which has alot of useful functions
 
-    clientSocket.send('motd', 'You can find the protocol documentation here: https://google.de')
+    clientSocket.send('motd', 'You can find the protocol documentation here: https://github.com/freehuntx/gpn-mazing/blob/master/PROTOCOL.md')
 
     // We need a timeout to detect if a client takes too long to join. 5 seconds should be fine
     const joinTimeout = setTimeout(() => {
