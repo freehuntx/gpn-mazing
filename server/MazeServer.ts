@@ -9,7 +9,7 @@ import { Game, GameState } from './Game'
 
 const PLAYER_DATA_PATH = os.tmpdir() + '/gpn-mazing-player-data.json'
 const INTERNAL_HOST = Object.values(os.networkInterfaces()).map(e => e || []).flat().filter(e => !e.internal && String(e.family).includes('4')).pop()?.address || ''
-
+console.log('')
 if (!INTERNAL_HOST) throw new Error('Failed getting internal ip!')
 
 type ServerInfoState = { host: string; port: number }
@@ -43,7 +43,7 @@ export class MazeServer extends EventEmitter {
       scoreboard: []
     })
 
-    this.#loadPlayerData()
+    //this.#loadPlayerData()
     this.#updateScoreboard()
 
     // Lets wait a tick before we start. So one could listen to the started event.
