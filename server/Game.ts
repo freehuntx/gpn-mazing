@@ -38,7 +38,7 @@ export class Game extends EventEmitter {
       goal: this.#maze.goal
     }
 
-    const tickInterval = setInterval(() => this.#onTick(), 1000 / 5)
+    const tickInterval = setInterval(() => this.#onTick(), 1000 / 3)
     this.on('end', () => clearInterval(tickInterval))
   }
 

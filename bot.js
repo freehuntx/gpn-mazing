@@ -28,6 +28,14 @@ class Client extends EventEmitter {
     this.#socket.on('connect', () => {
       this.#connected = true
       this.emit('connected')
+
+      const chatSendInterval = setInterval(() => {
+        this.send('chat', 'Im a stupid bot')
+      }, 6000)
+
+      this.once('disconnected', () => {
+        clearInterval(chatSendInterval)
+      })
     })
 
     this.#socket.on('data', chunk => {
@@ -93,6 +101,7 @@ client.on('packet', (type, ...args) => {
     if (!bottom) moves.push('down')
 
     if (moves.length > 0) client.send('move', moves[Math.floor(Math.random() * moves.length)])
+    return
   }
 
   console.log('[Bot] Packet:', type, ...args)

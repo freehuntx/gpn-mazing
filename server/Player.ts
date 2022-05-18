@@ -108,8 +108,8 @@ export class Player extends EventEmitter {
 
           // Clear the chat message in 5 seconds
           setTimeout(() => {
-            this.#chatMessage = ''
-            this.#state.chat = undefined
+            this.#chatMessage = undefined
+            delete this.#state.chat
           }, 5000)
         }
       }
@@ -121,7 +121,7 @@ export class Player extends EventEmitter {
   #onDisconnect() {
     this.#socket?.removeAllListeners()
     this.#socket = undefined
-    this.#chatMessage = ''
+    this.#chatMessage = undefined
     this.#action = PlayerAction.NONE
     this.emit('disconnected')
   }

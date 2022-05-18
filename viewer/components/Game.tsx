@@ -94,7 +94,14 @@ export function Game() {
         ctx.arc(nativeX + factoredFloorSize * 0.5 + 1, nativeY + factoredFloorSize * 0.5 + 1, playerRadius, 0, 2 * Math.PI, false);
         ctx.fill()
 
-        ctx.fillText(username, nativeX, nativeY)
+        ctx.fillText(username, nativeX, nativeY, factoredRoomSize)
+
+        if (chat) {
+          ctx.fillStyle = 'white'
+          ctx.fillRect(nativeX  - 10, nativeY + factoredRoomSize - 20, ctx.measureText(chat).width + 20, 40)
+          ctx.fillStyle = 'black'
+          ctx.fillText(chat, nativeX, nativeY + factoredRoomSize)
+        }
       }
     }, 1000 / 30)
 

@@ -33,6 +33,7 @@ export function GameProvider({ children }: { children: React.ReactElement }) {
       setServerInfo(client.state.serverInfo)
       setScoreboard(client.state.scoreboard)
       setGame(client.state.game)
+      window.game = client.state.game
     })
   }, [])
 
