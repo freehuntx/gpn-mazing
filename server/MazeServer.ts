@@ -9,7 +9,7 @@ import { Game, GameState } from './Game'
 
 const PLAYER_DATA_PATH = os.tmpdir() + '/gpn-mazing-player-data.json'
 const INTERNAL_HOST = Object.values(os.networkInterfaces()).map(e => e || []).flat().filter(e => !e.internal && String(e.family).includes('4')).pop()?.address || ''
-console.log('')
+
 if (!INTERNAL_HOST) throw new Error('Failed getting internal ip!')
 
 type ServerInfoState = { host: string; port: number }
@@ -140,7 +140,6 @@ export class MazeServer extends EventEmitter {
       else if (gameTime < minTime) difficulty++ // Raise difficulty if its too easy
 
       // Since the game did end lets create a new one with new difficulty
-      console.log('Game before start new')
       setTimeout(() => this.#startGame(difficulty), 100)
     })
   }

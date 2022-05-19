@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from "react"
 import { useGame } from "../providers/Game"
 
-const wallSize = 1
+const wallSize = 2
 const floorSize = 16
-const roomSize = floorSize + wallSize * 2
+const roomSize = floorSize + wallSize
 const playerColors = ['red', 'green', 'blue', 'orange', 'yellow', 'violet']
 
 export function Game() {
@@ -37,9 +37,13 @@ export function Game() {
         for (const { pos: { x, y } } of Object.values(game.walls)) {
           lowestX = Math.min(lowestX, x)
           lowestY = Math.min(lowestY, y)
-          highestX = Math.max(highestX, x+1)
-          highestY = Math.max(highestY, y+1)
+          highestX = Math.max(highestX, x)
+          highestY = Math.max(highestY, y)
         }
+
+        // Increase by one  to get the proper width/height
+        highestX++
+        highestY++
 
         const width = Math.abs(highestX - lowestX)
         const height = Math.abs(highestY - lowestY)
@@ -48,59 +52,71 @@ export function Game() {
         const factor = canvasPixelSize / pixelSize
 
         return {
-          width, height, size,
+          //width, height, size,
           x: lowestX,
           y: lowestY,
-          pixelSize,
+          //pixelSize,
           factor
         }
       })()
 
       const factoredRoomSize = roomSize * view.factor
       const factoredWallSize = wallSize * view.factor
+      const factoredHalfWallSize = factoredWallSize / 2
       const factoredFloorSize = floorSize * view.factor
 
       // Clear frame
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       // Render walls
-      for (const { pos: { x, y }, top, right, bottom, left } of Object.values(game.walls)) {
-        const xInView = x - view.x
-        const yInView = y - view.y
-        const nativeX = xInView * factoredRoomSize
-        const nativeY = yInView * factoredRoomSize
+      for (let { pos: { x, y }, top, right, bottom, left } of Object.values(game.walls)) {
+        x -= view.x
+        y -= view.y
+        x *= factoredRoomSize
+        y *= factoredRoomSize
         ctx.fillStyle = "white"
+        
+        const clearX = x + factoredHalfWallSize
+        const clearY = y + factoredHalfWallSize
+        ctx.fillStyle = "white"
+        ctx.fillRect(x - factoredHalfWallSize, y - factoredHalfWallSize, factoredRoomSize + factoredWallSize, factoredRoomSize + factoredWallSize)
+        ctx.clearRect(clearX, clearY, factoredFloorSize, factoredFloorSize)
 
-        if (top == true) ctx.fillRect(nativeX, nativeY, factoredRoomSize, factoredWallSize)
-        if (right == true) ctx.fillRect(nativeX + factoredWallSize + factoredFloorSize, nativeY, factoredWallSize, factoredRoomSize)
-        if (bottom == true) ctx.fillRect(nativeX, nativeY + factoredWallSize + factoredFloorSize, factoredRoomSize, factoredWallSize)
-        if (left == true) ctx.fillRect(nativeX, nativeY, factoredWallSize, factoredRoomSize)
+        if (!top) ctx.clearRect(clearX, clearY - factoredWallSize - 2, factoredFloorSize, factoredWallSize + 4)
+        if (!right) ctx.clearRect(clearX, clearY, factoredFloorSize + factoredWallSize + 4, factoredFloorSize)
+        if (!bottom) ctx.clearRect(clearX, clearY, factoredFloorSize, factoredFloorSize + factoredWallSize + 4)
+        if (!left) ctx.clearRect(clearX - factoredWallSize - 2, clearY, factoredWallSize + 4, factoredFloorSize)
+        
+        //if (top == true) ctx.fillRect(x - (factoredWallSize/2), y - (factoredWallSize/2), factoredRoomSize + factoredWallSize, factoredWallSize)
+        //if (right == true) ctx.fillRect(x + factoredWallSize + factoredFloorSize - (factoredWallSize/2), y, factoredWallSize, factoredRoomSize)
+        //if (bottom == true) ctx.fillRect(x, y + factoredWallSize + factoredFloorSize - (factoredWallSize/2), factoredRoomSize, factoredWallSize)
+        //if (left == true) ctx.fillRect(x - (factoredWallSize/2), y, factoredWallSize, factoredRoomSize)
       }
 
       // Render players
       ctx.font = '12px serif'
       const playerEntries = Object.entries(game.players)
       for (let i = 0; i < playerEntries.length; i++) {
-        const [username, { pos: { x, y }, chat }] = playerEntries[i]
-        const xInView = x - view.x
-        const yInView = y - view.y
-        const nativeX = xInView * factoredRoomSize
-        const nativeY = yInView * factoredRoomSize
+        let [username, { pos: { x, y }, chat }] = playerEntries[i]
+        x -= view.x
+        y - view.y
+        x *= factoredRoomSize
+        y *= factoredRoomSize
 
         const playerRadius = factoredFloorSize * 0.2
         ctx.fillStyle = playerColors[i % (playerColors.length - 1)]
 
         ctx.beginPath()
-        ctx.arc(nativeX + factoredFloorSize * 0.5 + 1, nativeY + factoredFloorSize * 0.5 + 1, playerRadius, 0, 2 * Math.PI, false);
+        ctx.arc(x + factoredFloorSize * 0.5, y + factoredFloorSize * 0.5 + 1, playerRadius, 0, 2 * Math.PI, false);
         ctx.fill()
 
-        ctx.fillText(username, nativeX, nativeY, factoredRoomSize)
+        ctx.fillText(username, x, y, factoredRoomSize)
 
         if (chat) {
           ctx.fillStyle = 'white'
-          ctx.fillRect(nativeX  - 10, nativeY + factoredRoomSize - 20, ctx.measureText(chat).width + 20, 40)
+          ctx.fillRect(x  - 10, y + factoredRoomSize - 20, ctx.measureText(chat).width + 20, 40)
           ctx.fillStyle = 'black'
-          ctx.fillText(chat, nativeX, nativeY + factoredRoomSize)
+          ctx.fillText(chat, x, y + factoredRoomSize)
         }
       }
     }, 1000 / 30)
@@ -111,6 +127,6 @@ export function Game() {
   }, [canvasRef.current, game])
 
   return (
-    <canvas ref={canvasRef} style={{ background: 'black' }}></canvas>
+    <canvas ref={canvasRef} style={{ display: 'flex', margin: 'auto' }}></canvas>
   )
 }

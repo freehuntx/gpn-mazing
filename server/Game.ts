@@ -76,8 +76,6 @@ export class Game extends EventEmitter {
 
     this.#players.splice(playerIndex, 1)
     delete this.#state.players[player.username]
-    console.log('Removed player from state')
-    //this.emit('playerRemoved', player)
   }
 
   #updatePlayerPosition(player: Player, x: number, y: number) {

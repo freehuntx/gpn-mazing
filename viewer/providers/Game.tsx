@@ -7,7 +7,7 @@ type Player = { username: string; pos: Vec2 }
 type Wall = { pos: Vec2; top: boolean; right: boolean; bottom: boolean; left: boolean }
 
 type Game = {
-  players: Record<string, { pos: Vec2 }>
+  players: Record<string, { pos: Vec2; chat?: string }>
   walls: Record<string, Wall>
 }
 

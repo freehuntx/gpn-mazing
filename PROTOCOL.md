@@ -34,7 +34,7 @@ The join packet is the first packet the client has to send to the server when co
 | 1 | String | The username |
 | 2 | String | The password |
 
-**Example:** `join|Cool Guy`
+**Example:** `join|Cool Guy|mysupersecret`
 
 ### error
 The error packet is sent by the server if something went wrong.
@@ -71,10 +71,10 @@ The pos packet is sent by the server to inform the client about its position and
 |---|--------|--------------------------------------------------------------------|
 | 1 | Number | x position of the client                                           |
 | 2 | Number | y position of the client                                           |
-| 3 | Number | 0 if there is no wall at top and 1 if there IS a wall at top       |
-| 4 | Number | 0 if there is no wall right and 1 if there IS a wall right         |
-| 5 | Number | 0 if there is no wall at bottom and 1 if there IS a wall at bottom |
-| 6 | Number | 0 if there is no wall left and 1 if there IS a wall left           |
+| 3 | Number | 0 if there is no wall to the top and 1 if there IS a wall to the top       |
+| 4 | Number | 0 if there is no wall to the right and 1 if there IS a wall to the right         |
+| 5 | Number | 0 if there is no wall to the bottom and 1 if there IS a wall to the bottom |
+| 6 | Number | 0 if there is no wall to the left and 1 if there IS a wall to the left           |
 
 **Example:** `pos|5|3|0|1|1|1`
 
@@ -103,7 +103,7 @@ The chat packet is sent by the client to send a cool chat message :>.
 **Example:** `chat|I am so cool`
 
 ### win
-The win packet is sent by the server to inform the client he won.
+The win packet is sent by the server to inform the client they won.
 
 **Name:** win  
 **Sender:** Server  
@@ -116,7 +116,7 @@ The win packet is sent by the server to inform the client he won.
 **Example:** `win|1|20`
 
 ### lose
-The lose packet is sent by the server to inform the client he lost.
+The lose packet is sent by the server to inform the client they lost.
 
 **Name:** lose  
 **Sender:** Server  
