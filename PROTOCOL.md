@@ -34,7 +34,7 @@ The join packet is the first packet the client has to send to the server when co
 | 1 | String | The username |
 | 2 | String | The password |
 
-**Example:** `join|Cool Guy`
+**Example:** `join|Cool|Guy`
 
 ### error
 The error packet is sent by the server if something went wrong.
