@@ -11,8 +11,9 @@ const GAME_DATA_PATH = os.tmpdir() + '/gpn-mazing-data.json'
 const HOSTNAMES = Object.values(os.networkInterfaces())
   .map(e => e || [])
   .flat()
-  .filter(e => !e.internal)
+  .filter(e => !e.internal && String(e.family).includes('4'))
   .map(({ address }) => address)
+HOSTNAMES.unshift('gpn-mazing.gpn-mazing.v6.rocks')
 
 if (HOSTNAMES.length === 0) throw new Error('Failed getting external ips!')
 
