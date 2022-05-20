@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events'
 import { ClientSocket } from './ClientSocket'
+import { Game } from './Game'
 
 export enum PlayerAction {
   NONE,
@@ -20,6 +21,7 @@ export class Player extends EventEmitter {
   #password = ''
   #chatMessage?: string
   #pos = { x: 0, y: 0 }
+  #game?: Game
   #action: PlayerAction = PlayerAction.NONE
   #state: PlayerState
   wins = 0
@@ -53,6 +55,17 @@ export class Player extends EventEmitter {
     this.#socket = socket
     this.#socket.on('packet', this.#onPacket.bind(this))
     this.#socket.on('disconnected', this.#onDisconnect.bind(this))
+  }
+
+  joinGame(game: Game) {
+    if (this.#game) this.leaveGame()
+    this.#game = game
+    this.#game.addPlayer(this)
+  }
+
+  leaveGame() {
+    this.#game?.removePlayer(this)
+    this.#game = undefined
   }
 
   setPos(x: number, y: number) {
@@ -119,6 +132,7 @@ export class Player extends EventEmitter {
   }
 
   #onDisconnect() {
+    if (this.#game) this.leaveGame()
     this.#socket?.removeAllListeners()
     this.#socket = undefined
     this.#chatMessage = undefined

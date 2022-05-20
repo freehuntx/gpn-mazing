@@ -118,7 +118,7 @@ export class MazeServer extends EventEmitter {
     // Lets add current connected players to the game
     for (const player of Object.values(this.#players)) {
       if (!player.connected) continue
-      game.addPlayer(player)
+      player.joinGame(game)
     }
 
     // Lets listen to the game end event
@@ -183,7 +183,10 @@ export class MazeServer extends EventEmitter {
       if (player) {
         // There is a player with this name already? Check if the password is correct!
         if (player.password !== password) return clientSocket.sendError('wrong password', true)
-        if (player.connected) return clientSocket.sendError('user already connected', true)
+        if (player.connected) {
+          player.leaveGame()
+          player.sendError('Kicked out of session. Somebody else uses your user!', true)
+        }
       } else {
         // Create a new player if we dont know this user yet
         player = new Player(username, password)
@@ -193,8 +196,8 @@ export class MazeServer extends EventEmitter {
       clearTimeout(joinTimeout) // Timeout is not needed as the client joined properly
       player.setSocket(clientSocket) // Lets update the socket of this player
 
-      // If there is a game running add the player to it
-      if (this.#game) this.#game.addPlayer(player)
+      // If there is a game let the player join it
+      if (this.#game) player.joinGame(this.#game)
     })
   }
 }

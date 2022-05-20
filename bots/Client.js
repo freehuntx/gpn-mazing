@@ -13,7 +13,7 @@ class Client extends EventEmitter {
     this.#host = host
     this.#port = port
 
-    this.once('connected', () => {
+    this.on('connected', () => {
       this.send('join', username, password)
     })
 
@@ -30,10 +30,10 @@ class Client extends EventEmitter {
       this.emit('connected')
 
       this.once('disconnected', () => {
-        console.log('Disconnected. Reconnecting in 1 second...')
+        console.log('Disconnected. Reconnecting in 5 second...')
         setTimeout(() => {
           this.#connect()
-        }, 1000)
+        }, 5000)
       })
     })
 
@@ -60,10 +60,7 @@ class Client extends EventEmitter {
   }
 
   #onPacket(packet) {
-    const args = packet.split('|').map(e => {
-      if (/^\-?\d+(\.\d+)?$/.test(e)) return Number(e)
-      return e
-    })
+    const args = packet.split('|').map(arg => /^\-?\d+(\.\d+)?$/.test(arg) ? Number(arg) : arg)
     const type = args.shift()
     this.emit('packet', type, ...args)
   }

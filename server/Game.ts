@@ -40,12 +40,6 @@ export class Game extends EventEmitter {
     this.#players.push(player)
     this.#state.players[player.username] = player.state
 
-    const onPlayerDisconnected = () => {
-      this.removePlayer(player)
-    }
-    player.once('disconnected', onPlayerDisconnected)
-    this.once('end', () => player.off('disconnected', onPlayerDisconnected))
-
     player.send('goal', this.#maze.goal.x, this.#maze.goal.y)
     this.#updatePlayerPosition(player, this.#maze.start.x, this.#maze.start.y)
   }
