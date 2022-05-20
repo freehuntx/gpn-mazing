@@ -13,7 +13,7 @@ const HOSTNAMES = Object.values(os.networkInterfaces())
   .flat()
   .filter(e => !e.internal && String(e.family).includes('4'))
   .map(({ address }) => address)
-HOSTNAMES.unshift('gpn-mazing.gpn-mazing.v6.rocks')
+HOSTNAMES.unshift('gpn-mazing.v6.rocks')
 
 if (HOSTNAMES.length === 0) throw new Error('Failed getting external ips!')
 
