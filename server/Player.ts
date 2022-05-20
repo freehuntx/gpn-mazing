@@ -28,6 +28,8 @@ export class Player extends EventEmitter {
   #action: PlayerAction = PlayerAction.NONE
   #state: PlayerState
   #scoreHistory: ScoreHistory = []
+  #eloScore = 1000
+
 
   constructor(username: string, password: string) {
     super()
@@ -43,6 +45,8 @@ export class Player extends EventEmitter {
   get pos(): { x: number; y: number } { return this.#pos }
   get connected(): boolean { return !!this.#socket?.connected }
   get state(): PlayerState { return this.#state }
+  get eloScore(): number { return this.#eloScore }
+  set eloScore(eloScore: number) { this.#eloScore = eloScore }
 
   // Returns the time filtered scores. Everything above 2 hours is removed.
   get scoreHistory(): ScoreHistory {

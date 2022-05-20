@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events'
 import { Player, PlayerAction, PlayerState } from "./Player"
 import { createMaze, Maze } from './util/maze'
+import { MultiElo } from 'multi-elo'
 
 export interface GameState {
   players: Record<string, PlayerState>
@@ -63,10 +64,22 @@ export class Game extends EventEmitter {
     // Check for winners
     const winners = this.#players.filter(player => player.pos.x === this.#maze.goal.x && player.pos.y === this.#maze.goal.y)
     if (winners.length > 0) {
-      for (const player of this.#players) {
-        if (winners.includes(player)) player.win()
-        else player.lose()
+      if (this.#players.length > 1) {
+        for (const player of this.#players) {
+          if (winners.includes(player)) player.win()
+          else player.lose()
+        }
+
+        // Update ELO scores
+        const losers = this.#players.filter(player => !(player.pos.x === this.#maze.goal.x && player.pos.y === this.#maze.goal.y))
+        const playersInOrder = [...winners, ...losers];
+        const placesInOrder = [...(winners.map(player => 1)), ...(losers.map(player => 2))];
+        const newEloScores = MultiElo.getNewRatings(playersInOrder.map(player => player.eloScore), placesInOrder);
+        for (let i = 0; i < playersInOrder.length; i++) {
+          playersInOrder[i].eloScore = newEloScores[i];
+        }
       }
+      
 
       this.emit('end')
       return

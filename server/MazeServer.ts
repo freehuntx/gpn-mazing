@@ -13,7 +13,7 @@ const INTERNAL_HOST = Object.values(os.networkInterfaces()).map(e => e || []).fl
 if (!INTERNAL_HOST) throw new Error('Failed getting internal ip!')
 
 type ServerInfoState = { host: string; port: number }
-type ScoreboardState = { username: string; wins: number; loses: number }[]
+type ScoreboardState = { username: string; wins: number; loses: number, elo: number }[]
 
 interface State {
   serverInfo: ServerInfoState
@@ -95,10 +95,10 @@ export class MazeServer extends EventEmitter {
 
   #updateScoreboard() {
     this.#viewServer.state.scoreboard = Object.values(this.#players)
-      .map(({ username, wins, loses }) => {
+      .map(({ username, wins, loses, eloScore }) => {
         const games = wins + loses
         const winRatio = games > 0 ? wins / games : 0
-        return { username, winRatio, wins, loses }
+        return { username, winRatio, wins, loses, elo: eloScore }
       })
       //.filter(({ winRatio }) => winRatio > 0)
       .sort((a, b) => {
@@ -107,7 +107,7 @@ export class MazeServer extends EventEmitter {
         return b.wins - a.wins
       })
       .slice(0, 20)
-      .map(({ username, winRatio, wins, loses }) => ({ username, winRatio, wins, loses }))
+      .map(({ username, winRatio, wins, loses, elo }) => ({ username, winRatio, wins, loses, elo }))
   }
 
   /**
