@@ -8,15 +8,19 @@ import { Player } from './Player'
 import { Game, GameState } from './Game'
 
 const GAME_DATA_PATH = os.tmpdir() + '/gpn-mazing-data.json'
-const INTERNAL_HOST = Object.values(os.networkInterfaces()).map(e => e || []).flat().filter(e => !e.internal && String(e.family).includes('4')).pop()?.address || ''
+const HOSTNAMES = Object.values(os.networkInterfaces())
+  .map(e => e || [])
+  .flat()
+  .filter(e => !e.internal)
+  .map(({ address }) => address)
 
-if (!INTERNAL_HOST) throw new Error('Failed getting internal ip!')
+if (HOSTNAMES.length === 0) throw new Error('Failed getting external ips!')
 
-type ServerInfoState = { host: string; port: number }
+type ServerInfoListState = { host: string; port: number }[]
 type ScoreboardState = { username: string; wins: number; loses: number }[]
 
 interface State {
-  serverInfo: ServerInfoState
+  serverInfoList: ServerInfoListState
   scoreboard: ScoreboardState
   game?: GameState
   lastWinners: string[]
@@ -38,10 +42,10 @@ export class MazeServer extends EventEmitter {
 
     this.#gameServer = createServer(socket => this.#onSocket(socket))
     this.#viewServer = new WsStateServer(this.#viewPort, {
-      serverInfo: {
-        host: INTERNAL_HOST,
+      serverInfoList: HOSTNAMES.map(host => ({
+        host,
         port: this.#gamePort
-      },
+      })),
       scoreboard: [],
       lastWinners: []
     })
