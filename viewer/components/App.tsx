@@ -12,7 +12,7 @@ export function App() {
         <Game />
       </div>
       <div style={{ flexGrow: 1, padding: '1em' }}>
-        <h3>Serverinfo:</h3>
+        <h3>Serverinfo: (Please prefer IPv6! As IPv4 may change :()</h3>
         <ul>
           {serverInfoList.map(({ host, port }) => (
             <li key={`${host}:${port}`}>TCP: {`${host}:${port}`}</li>
