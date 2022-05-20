@@ -29,12 +29,7 @@ class Client extends EventEmitter {
       this.#connected = true
       this.emit('connected')
 
-      const chatSendInterval = setInterval(() => {
-        this.send('chat', 'Im a stupid bot')
-      }, 6000)
-
       this.once('disconnected', () => {
-        clearInterval(chatSendInterval)
         console.log('Disconnected. Reconnecting in 1 second...')
         setTimeout(() => {
           this.#connect()
@@ -83,47 +78,6 @@ class Client extends EventEmitter {
   }
 }
 
-const client = new Client('127.0.0.1', 4000, 'bot-boschi', 'somePass')
-let decisions = {}
-
-client.on('connected', () => {
-  console.log('[Bot] Connected to server')
-})
-
-client.on('packet', (type, ...args) => {
-  if (type === 'error') {
-    console.log('Error:', args[0])
-    return
-  }
-
-  if (type === 'goal') {
-    decisions = {}
-  }
-
-  if (type === 'pos') {
-    const [x, y, top, right, bottom, left] = args
-
-    let moves = []
-    if (!top) moves.push('up')
-    if (!right) moves.push('right')
-    if (!bottom) moves.push('down')
-    if (!left) moves.push('left')
-
-    const newMoves = moves.filter(move => !decisions[`${x}:${y}:${move}`])
-
-    if (newMoves.length > 0) moves = newMoves
-    const move = moves[Math.floor(Math.random()*moves.length)]
-
-    decisions[`${x}:${y}:${move}`] = true
-
-    client.send('move', move)
-
-    return
-  }
-
-  console.log('[Bot] Packet:', type, ...args)
-})
-
-client.on('disconnected', () => {
-  console.log('[Bot] Disconnected')
-})
+module.exports = {
+  Client
+}
