@@ -72,9 +72,10 @@ export class MazeServer extends EventEmitter {
       if (!gameData.players) gameData.players = {}
       
       const playerdata: Record<string, any> = gameData.players
-      for (const [username, { password, scoreHistory }] of Object.entries(playerdata)) {
+      for (const [username, { password, scoreHistory, eloScore }] of Object.entries(playerdata)) {
         if (!this.#players[username]) this.#players[username] = new Player(username, password)
         if (scoreHistory) this.#players[username].scoreHistory = scoreHistory
+        if (eloScore) this.#players[username].eloScore = eloScore;
       }
 
       if (gameData.difficulty) this.#difficulty = gameData.difficulty
@@ -94,8 +95,8 @@ export class MazeServer extends EventEmitter {
       const gameData = JSON.parse(fs.readFileSync(GAME_DATA_PATH).toString())
       if (!gameData.players) gameData.players = {}
 
-      for (const { username, password, scoreHistory } of Object.values(this.#players)) {
-        gameData.players[username] = { password, scoreHistory }
+      for (const { username, password, scoreHistory, eloScore } of Object.values(this.#players)) {
+        gameData.players[username] = { password, scoreHistory, eloScore }
       }
 
       gameData.difficulty = this.#difficulty
