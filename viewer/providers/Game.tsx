@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { WsStateClient } from '../../libs/ws-state/client'
 
 type ServerInfoList = { host: string; port: number }[]
-type ScoreboardEntry = { username: string; winRatio: number; wins: number; loses: number }
+type ScoreboardEntry = { username: string; winRatio: number; wins: number; loses: number, elo: number }
 type Wall = { pos: Vec2; top: boolean; right: boolean; bottom: boolean; left: boolean }
 type ChartData = Record<string, any>[]
 

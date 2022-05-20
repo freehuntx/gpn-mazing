@@ -18,7 +18,7 @@ HOSTNAMES.unshift('gpn-mazing.v6.rocks')
 if (HOSTNAMES.length === 0) throw new Error('Failed getting external ips!')
 
 type ServerInfoListState = { host: string; port: number }[]
-type ScoreboardState = { username: string; wins: number; loses: number }[]
+type ScoreboardState = { username: string; wins: number; loses: number, elo: number }[]
 type ChartDataState = Record<string, any>[]
 
 interface State {
@@ -80,9 +80,10 @@ export class MazeServer extends EventEmitter {
       if (!gameData.players) gameData.players = {}
       
       const playerdata: Record<string, any> = gameData.players
-      for (const [username, { password, scoreHistory }] of Object.entries(playerdata)) {
+      for (const [username, { password, scoreHistory, eloScore }] of Object.entries(playerdata)) {
         if (!this.#players[username]) this.#players[username] = new Player(username, password)
         if (scoreHistory) this.#players[username].scoreHistory = scoreHistory
+        if (eloScore) this.#players[username].eloScore = eloScore;
       }
 
       if (gameData.difficulty) this.#difficulty = gameData.difficulty
@@ -102,8 +103,8 @@ export class MazeServer extends EventEmitter {
       const gameData = JSON.parse(fs.readFileSync(GAME_DATA_PATH).toString())
       if (!gameData.players) gameData.players = {}
 
-      for (const { username, password, scoreHistory } of Object.values(this.#players)) {
-        gameData.players[username] = { password, scoreHistory }
+      for (const { username, password, scoreHistory, eloScore } of Object.values(this.#players)) {
+        gameData.players[username] = { password, scoreHistory, eloScore }
       }
 
       gameData.difficulty = this.#difficulty
@@ -124,7 +125,7 @@ export class MazeServer extends EventEmitter {
       .slice(0, 10)
 
     this.#viewServer.state.scoreboard = scoreboardPlayers
-      .map(({ username, winRatio, wins, loses }) => ({ username, winRatio, wins, loses }))
+      .map(({ username, winRatio, wins, loses, eloScore }) => ({ username, winRatio, wins, loses, elo: eloScore }))
     
     this.#updateChartData(scoreboardPlayers)
   }

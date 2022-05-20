@@ -1,6 +1,9 @@
 const { Client } = require('./Client')
 
-const client = new Client('127.0.0.1', 4000, '<Your Username>', '<Your Password>')
+const username = process.argv[2] || '<Your Username>'
+const password = process.argv[3] || '<Your Password>'
+
+const client = new Client('127.0.0.1', 4000, username, password)
 let decisions = {}
 
 client.on('connected', () => {
