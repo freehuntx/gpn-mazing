@@ -50,7 +50,7 @@ export class ClientSocket extends EventEmitter {
     this.#socket.on('error', this.#onError.bind(this))
   }
 
-  get connected(): boolean { return this.#connected }
+  get connected(): boolean { return !!this.#socket && !this.#socket.connecting && !this.#socket.destroyed && this.#connected }
 
   disconnect() {
     if (!this.#connected) return
@@ -63,7 +63,7 @@ export class ClientSocket extends EventEmitter {
   }
 
   send(type: string, ...args: any) {
-    if (!this.#connected) return
+    if (!this.connected) return
     this.#socket?.write(`${[type, ...args].join('|')}\n`)
   }
 
@@ -73,7 +73,7 @@ export class ClientSocket extends EventEmitter {
   }
 
   #onPacket(packet: string) {
-    if (!this.#connected) return
+    if (!this.connected) return
 
     const args = packet.split('|').map(arg => /^\-?\d+(\.\d+)?$/.test(arg) ? Number(arg) : arg)
     const type = args.shift()
