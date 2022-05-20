@@ -64,13 +64,13 @@ export class Game extends EventEmitter {
     // Check for winners
     const winners = this.#players.filter(player => player.pos.x === this.#maze.goal.x && player.pos.y === this.#maze.goal.y)
     if (winners.length > 0) {
-      if (this.#players.length > 1) {
-        for (const player of this.#players) {
-          if (winners.includes(player)) player.win()
-          else player.lose()
-        }
+      for (const player of this.#players) {
+        if (winners.includes(player)) player.win()
+        else player.lose()
+      }
 
-        // Update ELO scores
+      // Update ELO scores
+      if (this.#players.length > 1) {
         const losers = this.#players.filter(player => !(player.pos.x === this.#maze.goal.x && player.pos.y === this.#maze.goal.y))
         const playersInOrder = [...winners, ...losers];
         const placesInOrder = [...(winners.map(player => 1)), ...(losers.map(player => 2))];
@@ -80,7 +80,6 @@ export class Game extends EventEmitter {
         }
       }
       
-
       this.emit('end', winners)
       return
     }
