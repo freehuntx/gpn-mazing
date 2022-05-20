@@ -43,7 +43,7 @@ export class MazeServer extends EventEmitter {
       scoreboard: []
     })
 
-    //this.#loadPlayerData()
+    this.#loadPlayerData()
     this.#updateScoreboard()
 
     // Lets wait a tick before we start. So one could listen to the started event.
