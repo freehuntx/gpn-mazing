@@ -13,10 +13,11 @@ type Game = {
 interface GameContext {
   serverInfo?: ServerInfo
   scoreboard: ScoreboardEntry[]
+  lastWinners: string[]
   game?: Game
 }
 
-const gameContext = createContext<GameContext>({ scoreboard: [] })
+const gameContext = createContext<GameContext>({ scoreboard: [], lastWinners: [] })
 
 export const useGame = () => useContext(gameContext)
 
@@ -24,6 +25,7 @@ export function GameProvider({ children }: { children: React.ReactElement }) {
   const [serverInfo, setServerInfo] = useState<ServerInfo>()
   const [scoreboard, setScoreboard] = useState<ScoreboardEntry[]>([])
   const [game, setGame] = useState<Game>()
+  const [lastWinners, setLastWinners] = useState<string[]>([])
 
   useEffect(() => {
     const client = new WsStateClient(4001)
@@ -31,12 +33,13 @@ export function GameProvider({ children }: { children: React.ReactElement }) {
     client.on('update', () => {
       setServerInfo(client.state.serverInfo)
       setScoreboard(client.state.scoreboard)
+      setLastWinners(client.state.lastWinners)
       setGame(client.state.game)
     })
   }, [])
 
   return (
-    <gameContext.Provider value={{ serverInfo, scoreboard, game }}>
+    <gameContext.Provider value={{ serverInfo, scoreboard, game, lastWinners }}>
       {children}
     </gameContext.Provider>
   )

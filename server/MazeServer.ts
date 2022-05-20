@@ -19,6 +19,7 @@ interface State {
   serverInfo: ServerInfoState
   scoreboard: ScoreboardState
   game?: GameState
+  lastWinners: string[]
 }
 
 export class MazeServer extends EventEmitter {
@@ -41,7 +42,8 @@ export class MazeServer extends EventEmitter {
         host: INTERNAL_HOST,
         port: this.#gamePort
       },
-      scoreboard: []
+      scoreboard: [],
+      lastWinners: []
     })
 
     this.#loadGameData()
@@ -141,7 +143,7 @@ export class MazeServer extends EventEmitter {
     }
 
     // Lets listen to the game end event
-    game.on('end', () => {
+    game.on('end', (winners: Player[]) => {
       // We use the time the game did run to decide if we increase or decrease difficulty
       const gameTime = Date.now() - startTime
       const minTime = 50 * 1000 // minTime is the minimum time a game should run
@@ -149,6 +151,8 @@ export class MazeServer extends EventEmitter {
       game.removeAllListeners()
       delete this.#viewServer.state.game
       this.#game = undefined
+
+      this.#viewServer.state.lastWinners = winners.map(({ username }) => username)
 
       // Store the current game data
       this.#storeGameData()

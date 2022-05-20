@@ -68,7 +68,7 @@ export class Game extends EventEmitter {
         else player.lose()
       }
 
-      this.emit('end')
+      this.emit('end', winners)
       return
     }
 
