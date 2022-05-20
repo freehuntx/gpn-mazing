@@ -60,6 +60,10 @@ export class Player extends EventEmitter {
     const now = Date.now()
     return this.scoreHistory.filter(({ type }) => type === 'lose').length
   }
+  get winRatio(): number {
+    const games = this.wins + this.loses
+    return games > 0 ? this.wins / games : 0
+  }
 
   readAndResetAction(): PlayerAction {
     const action = this.#action
