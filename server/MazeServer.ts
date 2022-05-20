@@ -17,12 +17,14 @@ HOSTNAMES.unshift('gpn-mazing.v6.rocks')
 
 if (HOSTNAMES.length === 0) throw new Error('Failed getting external ips!')
 
-type ServerInfoListState = { host: string; port: number }
+type ServerInfoListState = { host: string; port: number }[]
 type ScoreboardState = { username: string; wins: number; loses: number, elo: number }[]
+type ChartDataState = Record<string, any>[]
 
 interface State {
   serverInfoList: ServerInfoListState
   scoreboard: ScoreboardState
+  chartData: ChartDataState
   game?: GameState
   lastWinners: string[]
 }
@@ -47,6 +49,7 @@ export class MazeServer extends EventEmitter {
         host,
         port: this.#gamePort
       })),
+      chartData: [],
       scoreboard: [],
       lastWinners: []
     })
@@ -111,13 +114,7 @@ export class MazeServer extends EventEmitter {
   }
 
   #updateScoreboard() {
-    this.#viewServer.state.scoreboard = Object.values(this.#players)
-      .map(({ username, wins, loses, eloScore }) => {
-        const games = wins + loses
-        const winRatio = games > 0 ? wins / games : 0
-        return { username, winRatio, wins, loses, elo: eloScore }
-      })
-      //.filter(({ winRatio }) => winRatio > 0)
+    const scoreboardPlayers: Player[] = Object.values(this.#players)
       .sort((a, b) => {
         const winRatioDiff = b.winRatio - a.winRatio
         if (winRatioDiff !== 0) return winRatioDiff
@@ -126,7 +123,34 @@ export class MazeServer extends EventEmitter {
         return b.loses - a.loses
       })
       .slice(0, 10)
-      .map(({ username, winRatio, wins, loses, elo }) => ({ username, winRatio, wins, loses, elo }))
+
+    this.#viewServer.state.scoreboard = scoreboardPlayers
+      .map(({ username, winRatio, wins, loses, eloScore }) => ({ username, winRatio, wins, loses, elo: eloScore }))
+    
+    this.#updateChartData(scoreboardPlayers)
+  }
+
+  #updateChartData(players: Player[]) {
+    const chartPoints = 20
+    const chartData = Array(chartPoints).fill(undefined).map((_, index) => {
+      const chartPoint: Record<string, any> = {
+        name: index
+      }
+
+      for (const player of players) {
+        const historyIndex = player.scoreHistory.length - (chartPoints - 1 - index)
+        const wins = player.scoreHistory.slice(0, historyIndex).filter(e => e.type === 'win').length
+        const loses = player.scoreHistory.slice(0, historyIndex).filter(e => e.type === 'lose').length
+        const games = wins + loses
+        const winRatio = games > 0 ? wins / games : 0
+
+        chartPoint[player.username] = winRatio
+      }
+
+      return chartPoint
+    })
+
+    this.#viewServer.state.chartData = chartData
   }
 
   /**
