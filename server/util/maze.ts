@@ -13,7 +13,7 @@ export function createMaze(difficulty: number): Maze {
   const height = difficulty
   const walls: WallsMap = {}
 
-  generator(width, height).flat().forEach(({ x, y, top, left, bottom, right }) => {
+  generator(width, height, true, Math.floor(Math.random() * 1337420)).flat().forEach(({ x, y, top, left, bottom, right }) => {
     if (!walls[x]) walls[x] = {}
     walls[x][y] = { top, left, bottom, right }
   })
