@@ -62,29 +62,12 @@ export class MazeServer extends EventEmitter {
   #loadGameData() {
     // Create the file if it was not found
     if (!fs.existsSync(GAME_DATA_PATH)) {
-      // TODO: Remove this tmp migration code
-      try {
-        const PLAYER_DATA_PATH = os.tmpdir() + '/gpn-mazing-player-data.json'
-        if (fs.existsSync(PLAYER_DATA_PATH)) {
-          const playerData: Record<string, any> = JSON.parse(fs.readFileSync(PLAYER_DATA_PATH).toString())
-          for (const [username, { password, scoreHistory }] of Object.entries(playerData)) {
-            if (!this.#players[username]) this.#players[username] = new Player(username, password)
-            if (scoreHistory) this.#players[username].scoreHistory = scoreHistory
-          }
-          this.#difficulty = 10
-          this.#storeGameData()
-
-          fs.unlinkSync(PLAYER_DATA_PATH)
-        }
-
-
-      } catch(error) {}
-
       fs.writeFileSync(GAME_DATA_PATH, '{}') // Empty object is default
     }
 
     try {
       const gameData = JSON.parse(fs.readFileSync(GAME_DATA_PATH).toString())
+      if (!gameData.players) gameData.players = {}
       
       const playerdata: Record<string, any> = gameData.players
       for (const [username, { password, scoreHistory }] of Object.entries(playerdata)) {
@@ -107,6 +90,7 @@ export class MazeServer extends EventEmitter {
 
     try {
       const gameData = JSON.parse(fs.readFileSync(GAME_DATA_PATH).toString())
+      if (!gameData.players) gameData.players = {}
 
       for (const { username, password, scoreHistory } of Object.values(this.#players)) {
         gameData.players[username] = { password, scoreHistory }
