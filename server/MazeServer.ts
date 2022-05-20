@@ -119,7 +119,7 @@ export class MazeServer extends EventEmitter {
         if (winDiff !== 0) return winDiff
         return b.loses - a.loses
       })
-      .slice(0, 20)
+      .slice(0, 10)
       .map(({ username, winRatio, wins, loses }) => ({ username, winRatio, wins, loses }))
   }
 
