@@ -15,6 +15,9 @@ export interface PlayerState {
   chat?: string
 }
 
+export type Score = { type: 'win' | 'lose'; time: number }
+export type ScoreHistory = Score[]
+
 export class Player extends EventEmitter {
   #socket?: ClientSocket
   #username = ''
@@ -24,8 +27,7 @@ export class Player extends EventEmitter {
   #game?: Game
   #action: PlayerAction = PlayerAction.NONE
   #state: PlayerState
-  wins = 0
-  loses = 0
+  #scoreHistory: ScoreHistory = []
 
   constructor(username: string, password: string) {
     super()
@@ -36,12 +38,28 @@ export class Player extends EventEmitter {
     }
   }
 
-  //get ip(): string { return this.#socket?.ip }
   get username(): string { return this.#username }
   get password(): string { return this.#password }
   get pos(): { x: number; y: number } { return this.#pos }
   get connected(): boolean { return !!this.#socket?.connected }
   get state(): PlayerState { return this.#state }
+
+  // Returns the time filtered scores. Everything above 2 hours is removed.
+  get scoreHistory(): ScoreHistory {
+    const now = Date.now()
+    this.#scoreHistory = this.#scoreHistory.filter(({ time }) => now - time <= (2 * 60 * 60 * 1000))
+    return this.#scoreHistory
+  }
+  set scoreHistory(newHistory: ScoreHistory) {
+    this.#scoreHistory = newHistory
+  }
+  get wins(): number {
+    return this.scoreHistory.filter(({ type }) => type === 'win').length
+  }
+  get loses(): number {
+    const now = Date.now()
+    return this.scoreHistory.filter(({ type }) => type === 'lose').length
+  }
 
   readAndResetAction(): PlayerAction {
     const action = this.#action
@@ -84,12 +102,12 @@ export class Player extends EventEmitter {
   }
 
   win() {
-    this.wins++
+    this.#scoreHistory.push({ type: 'win', time: Date.now() })
     this.#socket?.send('win', this.wins, this.loses)
   }
 
   lose() {
-    this.loses++
+    this.#scoreHistory.push({ type: 'lose', time: Date.now() })
     this.#socket?.send('lose', this.wins, this.loses)
   }
 

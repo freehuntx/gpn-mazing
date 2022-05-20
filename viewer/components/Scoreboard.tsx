@@ -10,16 +10,18 @@ export function Scoreboard() {
         <tr>
           <th></th>
           <th>Username</th>
+          <th>Win Ratio</th>
           <th>Wins</th>
           <th>Loses</th>
         </tr>
       </thead>
       <tbody>
         <tr style={{ height: '1em' }}></tr>
-        {scoreboard.map(({ username, wins, loses }, index) => (
+        {scoreboard.map(({ username, winRatio, wins, loses }, index) => (
           <tr key={username}>
             <td>{index + 1}.</td>
             <td>{username}</td>
+            <td>{winRatio.toFixed(2)}</td>
             <td>{wins}</td>
             <td>{loses}</td>
           </tr>

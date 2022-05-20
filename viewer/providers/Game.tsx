@@ -2,8 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { WsStateClient } from '../../libs/ws-state/client'
 
 type ServerInfo = { host: string; port: number }
-type ScoreboardEntry = { username: string; wins: number; loses: number }
-type Player = { username: string; pos: Vec2 }
+type ScoreboardEntry = { username: string; winRatio: number; wins: number; loses: number }
 type Wall = { pos: Vec2; top: boolean; right: boolean; bottom: boolean; left: boolean }
 
 type Game = {
@@ -33,7 +32,6 @@ export function GameProvider({ children }: { children: React.ReactElement }) {
       setServerInfo(client.state.serverInfo)
       setScoreboard(client.state.scoreboard)
       setGame(client.state.game)
-      window.game = client.state.game
     })
   }, [])
 

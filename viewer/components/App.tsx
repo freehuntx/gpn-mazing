@@ -16,7 +16,7 @@ export function App() {
           <span style={{ fontSize: '1.7em' }}><b>TCP Server:</b> {serverInfo.host}:{serverInfo.port}</span>
         )}
         <hr style={{ margin: '1em 0' }} />
-        <h2 style={{ marginBottom: '.5em' }}>Scoreboard</h2>
+        <h2 style={{ marginBottom: '.5em' }}>Scoreboard (Last 2 Hours)</h2>
         <Scoreboard />
       </div>
     </div>

@@ -66,10 +66,9 @@ export class MazeServer extends EventEmitter {
 
     try {
       const playerdata: Record<string, any> = JSON.parse(fs.readFileSync(PLAYER_DATA_PATH).toString())
-      for (const [username, { password, wins, loses }] of Object.entries(playerdata)) {
+      for (const [username, { password, scoreHistory }] of Object.entries(playerdata)) {
         if (!this.#players[username]) this.#players[username] = new Player(username, password)
-        if (wins) this.#players[username].wins = wins
-        if (loses) this.#players[username].loses = loses
+        if (scoreHistory) this.#players[username].scoreHistory = scoreHistory
       }
     } catch (error) { }
   }
@@ -86,8 +85,8 @@ export class MazeServer extends EventEmitter {
     try {
       const playerdata: Record<string, any> = JSON.parse(fs.readFileSync(PLAYER_DATA_PATH).toString())
 
-      for (const { username, password, wins, loses } of Object.values(this.#players)) {
-        playerdata[username] = { password, wins, loses }
+      for (const { username, password, scoreHistory } of Object.values(this.#players)) {
+        playerdata[username] = { password, scoreHistory }
       }
 
       fs.writeFileSync(PLAYER_DATA_PATH, JSON.stringify(playerdata, null, 2))
@@ -96,10 +95,19 @@ export class MazeServer extends EventEmitter {
 
   #updateScoreboard() {
     this.#viewServer.state.scoreboard = Object.values(this.#players)
-      .filter(({ wins }) => wins > 0)
-      .sort((a, b) => b.wins - a.wins)
-      .slice(0, 10)
-      .map(({ username, wins, loses }) => ({ username, wins, loses }))
+      .map(({ username, wins, loses }) => {
+        const games = wins + loses
+        const winRatio = games > 0 ? wins / games : 0
+        return { username, winRatio, wins, loses }
+      })
+      .filter(({ winRatio }) => winRatio > 0)
+      .sort((a, b) => {
+        const n = b.winRatio - a.winRatio
+        if (n !== 0) return n
+        return b.wins - a.wins
+      })
+      .slice(0, 20)
+      .map(({ username, winRatio, wins, loses }) => ({ username, winRatio, wins, loses }))
   }
 
   /**
