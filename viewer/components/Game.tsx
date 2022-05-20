@@ -86,11 +86,6 @@ export function Game() {
         if (!right) ctx.clearRect(clearX, clearY, factoredFloorSize + factoredWallSize + 4, factoredFloorSize)
         if (!bottom) ctx.clearRect(clearX, clearY, factoredFloorSize, factoredFloorSize + factoredWallSize + 4)
         if (!left) ctx.clearRect(clearX - factoredWallSize - 2, clearY, factoredWallSize + 4, factoredFloorSize)
-        
-        //if (top == true) ctx.fillRect(x - (factoredWallSize/2), y - (factoredWallSize/2), factoredRoomSize + factoredWallSize, factoredWallSize)
-        //if (right == true) ctx.fillRect(x + factoredWallSize + factoredFloorSize - (factoredWallSize/2), y, factoredWallSize, factoredRoomSize)
-        //if (bottom == true) ctx.fillRect(x, y + factoredWallSize + factoredFloorSize - (factoredWallSize/2), factoredRoomSize, factoredWallSize)
-        //if (left == true) ctx.fillRect(x - (factoredWallSize/2), y, factoredWallSize, factoredRoomSize)
       }
 
       // Render players

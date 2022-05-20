@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 import { Player, PlayerAction, PlayerState } from "./Player"
-import { createMaze, Maze, WallsMap } from './util/maze'
+import { createMaze, Maze } from './util/maze'
 
 export interface GameState {
   players: Record<string, PlayerState>
@@ -10,27 +10,14 @@ export interface GameState {
 
 export class Game extends EventEmitter {
   #maze: Maze
-  //#startedAt = new Date()
-  //#width = 5
-  //#height = 5
-  //#walls: WallsMap
-  //#seenWalls: Record<number, Record<number, WallInfo>> = {}
-  //#start: Vec2
-  //#goal: Vec2
   #players: Player[] = []
 
   #state: GameState
 
   constructor(difficulty: number) {
     super()
-    //this.#width = difficulty * 5
-    //this.#height = difficulty * 5
 
     this.#maze = createMaze(difficulty)
-
-    //this.#walls = walls
-    //this.#start = start
-    //this.#goal = goal
 
     this.#state = {
       players: {},
@@ -42,12 +29,6 @@ export class Game extends EventEmitter {
     this.on('end', () => clearInterval(tickInterval))
   }
 
-  //get width(): number { return this.#width }
-  //get height(): number { return this.#height }
-  //get players(): Player[] { return this.#players }
-  //get goal(): Vec2 { return this.#goal }
-  //get seenWalls(): Record<number, Record<number, WallInfo>> { return this.#seenWalls }
-  //get startedAt(): Date { return this.#startedAt }
   get state(): GameState { return this.#state }
 
   addPlayer(player: Player) {
@@ -58,7 +39,6 @@ export class Game extends EventEmitter {
 
     this.#players.push(player)
     this.#state.players[player.username] = player.state
-    //this.emit('playerAdded', player)
 
     const onPlayerDisconnected = () => {
       this.removePlayer(player)
