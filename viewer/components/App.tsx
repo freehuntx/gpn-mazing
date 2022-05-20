@@ -7,7 +7,7 @@ export function App() {
   const { serverInfoList, lastWinners } = useGame()
 
   return (
-    <div style={{ display: 'flex', height: '100%', fontSize: '1.3em', wordBreak: 'break-all', background: 'black', color: 'white' }}>
+    <div style={{ display: 'flex', height: '100%', fontSize: '1.3em', wordBreak: 'break-all' }}>
       <div style={{ width: '60%', height: '80%', flexShrink: 0 }}>
         <Game />
       </div>

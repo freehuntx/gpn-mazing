@@ -2,7 +2,6 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { GameProvider } from './providers/Game'
 import { App } from './components/App'
-import './index.css'
 
 function Root() {
   return (
