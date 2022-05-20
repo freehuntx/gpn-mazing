@@ -100,7 +100,7 @@ export class MazeServer extends EventEmitter {
         const winRatio = games > 0 ? wins / games : 0
         return { username, winRatio, wins, loses }
       })
-      .filter(({ winRatio }) => winRatio > 0)
+      //.filter(({ winRatio }) => winRatio > 0)
       .sort((a, b) => {
         const n = b.winRatio - a.winRatio
         if (n !== 0) return n
