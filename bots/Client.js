@@ -61,8 +61,8 @@ class Client extends EventEmitter {
 
   #onPacket(packet) {
     const args = packet.split('|').map(e => {
-      const int = parseInt(e)
-      if (!isNaN(int)) return int
+      const int = Number(e)
+      if (Number.isSafeInteger(int)) return int
       return e
     })
     const type = args.shift()
