@@ -7,7 +7,7 @@ import { ClientSocket } from './ClientSocket'
 import { Player } from './Player'
 import { Game, GameState } from './Game'
 
-const PLAYER_DATA_PATH = os.tmpdir() + '/gpn-mazing-player-data.json'
+const GAME_DATA_PATH = os.tmpdir() + '/gpn-mazing-data.json'
 const INTERNAL_HOST = Object.values(os.networkInterfaces()).map(e => e || []).flat().filter(e => !e.internal && String(e.family).includes('4')).pop()?.address || ''
 
 if (!INTERNAL_HOST) throw new Error('Failed getting internal ip!')
@@ -19,6 +19,7 @@ interface State {
   serverInfo: ServerInfoState
   scoreboard: ScoreboardState
   game?: GameState
+  lastWinners: string[]
 }
 
 export class MazeServer extends EventEmitter {
@@ -28,6 +29,7 @@ export class MazeServer extends EventEmitter {
   #viewServer: WsStateServer<State>
   #game?: Game // Game instance (if a game is active)
   #players: Record<string, Player> = {} // Map of players. Key=username, Value=player
+  #difficulty = 2
 
   constructor(gamePort: number, viewPort: number) {
     super()
@@ -40,10 +42,11 @@ export class MazeServer extends EventEmitter {
         host: INTERNAL_HOST,
         port: this.#gamePort
       },
-      scoreboard: []
+      scoreboard: [],
+      lastWinners: []
     })
 
-    this.#loadPlayerData()
+    this.#loadGameData()
     this.#updateScoreboard()
 
     // Lets wait a tick before we start. So one could listen to the started event.
@@ -56,40 +59,48 @@ export class MazeServer extends EventEmitter {
   }
 
   /**
-   * This method will load stored player data
+   * This method will load stored game data
    */
-  #loadPlayerData() {
+  #loadGameData() {
     // Create the file if it was not found
-    if (!fs.existsSync(PLAYER_DATA_PATH)) {
-      fs.writeFileSync(PLAYER_DATA_PATH, '{}') // Empty object is default
+    if (!fs.existsSync(GAME_DATA_PATH)) {
+      fs.writeFileSync(GAME_DATA_PATH, '{}') // Empty object is default
     }
 
     try {
-      const playerdata: Record<string, any> = JSON.parse(fs.readFileSync(PLAYER_DATA_PATH).toString())
+      const gameData = JSON.parse(fs.readFileSync(GAME_DATA_PATH).toString())
+      if (!gameData.players) gameData.players = {}
+      
+      const playerdata: Record<string, any> = gameData.players
       for (const [username, { password, scoreHistory }] of Object.entries(playerdata)) {
         if (!this.#players[username]) this.#players[username] = new Player(username, password)
         if (scoreHistory) this.#players[username].scoreHistory = scoreHistory
       }
+
+      if (gameData.difficulty) this.#difficulty = gameData.difficulty
     } catch (error) { }
   }
 
   /**
-   * This method will store player data
+   * This method will store game data
    */
-  #storePlayerData() {
+  #storeGameData() {
     // Create the file if it was not found
-    if (!fs.existsSync(PLAYER_DATA_PATH)) {
-      fs.writeFileSync(PLAYER_DATA_PATH, '{}') // Empty object is default
+    if (!fs.existsSync(GAME_DATA_PATH)) {
+      fs.writeFileSync(GAME_DATA_PATH, '{}') // Empty object is default
     }
 
     try {
-      const playerdata: Record<string, any> = JSON.parse(fs.readFileSync(PLAYER_DATA_PATH).toString())
+      const gameData = JSON.parse(fs.readFileSync(GAME_DATA_PATH).toString())
+      if (!gameData.players) gameData.players = {}
 
       for (const { username, password, scoreHistory } of Object.values(this.#players)) {
-        playerdata[username] = { password, scoreHistory }
+        gameData.players[username] = { password, scoreHistory }
       }
 
-      fs.writeFileSync(PLAYER_DATA_PATH, JSON.stringify(playerdata, null, 2))
+      gameData.difficulty = this.#difficulty
+
+      fs.writeFileSync(GAME_DATA_PATH, JSON.stringify(gameData, null, 2))
     } catch (error) { }
   }
 
@@ -102,11 +113,13 @@ export class MazeServer extends EventEmitter {
       })
       //.filter(({ winRatio }) => winRatio > 0)
       .sort((a, b) => {
-        const n = b.winRatio - a.winRatio
-        if (n !== 0) return n
-        return b.wins - a.wins
+        const winRatioDiff = b.winRatio - a.winRatio
+        if (winRatioDiff !== 0) return winRatioDiff
+        const winDiff = b.wins - a.wins
+        if (winDiff !== 0) return winDiff
+        return b.loses - a.loses
       })
-      .slice(0, 20)
+      .slice(0, 10)
       .map(({ username, winRatio, wins, loses, elo }) => ({ username, winRatio, wins, loses, elo }))
   }
 
@@ -115,11 +128,11 @@ export class MazeServer extends EventEmitter {
    * The method will call itself to keep games running.
    * @param difficulty A number that decides the map difficulty
    */
-  #startGame(difficulty: number = 2) {
+  #startGame() {
     if (this.#game) throw new Error('Game in progress')
     const startTime = Date.now()
 
-    const game = new Game(difficulty) // Create a new game
+    const game = new Game(this.#difficulty) // Create a new game
     this.#game = game
     this.#viewServer.state.game = game.state
 
@@ -130,7 +143,7 @@ export class MazeServer extends EventEmitter {
     }
 
     // Lets listen to the game end event
-    game.on('end', () => {
+    game.on('end', (winners: Player[]) => {
       // We use the time the game did run to decide if we increase or decrease difficulty
       const gameTime = Date.now() - startTime
       const minTime = 50 * 1000 // minTime is the minimum time a game should run
@@ -139,17 +152,19 @@ export class MazeServer extends EventEmitter {
       delete this.#viewServer.state.game
       this.#game = undefined
 
-      // Store the current player data as it contains the new wins and loses
-      this.#storePlayerData()
+      this.#viewServer.state.lastWinners = winners.map(({ username }) => username)
+
+      // Store the current game data
+      this.#storeGameData()
 
       this.#updateScoreboard()
 
       // Lets increase/decrease difficulty if needed
-      if (gameTime > maxTime && difficulty > 2) difficulty-- // Lower difficulty if its too hard
-      else if (gameTime < minTime) difficulty++ // Raise difficulty if its too easy
+      if (gameTime > maxTime && this.#difficulty > 2) this.#difficulty-- // Lower difficulty if its too hard
+      else if (gameTime < minTime) this.#difficulty++ // Raise difficulty if its too easy
 
       // Since the game did end lets create a new one with new difficulty
-      setTimeout(() => this.#startGame(difficulty), 100)
+      setTimeout(() => this.#startGame(), 100)
     })
   }
 

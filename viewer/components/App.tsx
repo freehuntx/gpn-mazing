@@ -4,7 +4,7 @@ import { Scoreboard } from './Scoreboard'
 import { Game } from './Game'
 
 export function App() {
-  const { serverInfo } = useGame()
+  const { serverInfo, lastWinners } = useGame()
 
   return (
     <div style={{ display: 'flex', height: '100%', fontSize: '1.3em', wordBreak: 'break-all', background: 'black', color: 'white' }}>
@@ -16,6 +16,17 @@ export function App() {
           <span style={{ fontSize: '1.7em' }}><b>TCP Server:</b> {serverInfo.host}:{serverInfo.port}</span>
         )}
         <hr style={{ margin: '1em 0' }} />
+        {lastWinners.length > 0 && (
+          <>
+            <h2>Last winners</h2>
+            <ul>
+              {lastWinners.map(username => (
+                <li key={username}>{username}</li>
+              ))}
+            </ul>
+            <hr style={{ margin: '1em 0' }} />
+          </>
+        )}
         <h2 style={{ marginBottom: '.5em' }}>Scoreboard (Last 2 Hours)</h2>
         <Scoreboard />
       </div>

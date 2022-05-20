@@ -12,6 +12,9 @@ export class ClientSocket extends EventEmitter {
     this.#connected = !!socket && !socket.connecting && !socket.destroyed
     this.#socket = socket
 
+    // We expect the user to send atleast every 10 seconds some data. Otherwise he is afk
+    let dataTimeout: any
+
     this.#socket.on('data', chunk => {
       // More than 10 packets per second can be considered as spam.
       // Increase packet recv counter by 1 and check if its above 10
@@ -23,6 +26,11 @@ export class ClientSocket extends EventEmitter {
       setTimeout(() => {
         this.#recvPacketCount--
       }, 1000)
+
+      clearTimeout(dataTimeout)
+      dataTimeout = setTimeout(() => {
+        return this.sendError('Not active since 10 seconds. BB!', true)
+      }, 10000)
 
       this.#recvBuffer += chunk.toString()
 
