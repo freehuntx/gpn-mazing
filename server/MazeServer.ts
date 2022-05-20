@@ -68,7 +68,8 @@ export class MazeServer extends EventEmitter {
       const playerdata: Record<string, any> = JSON.parse(fs.readFileSync(PLAYER_DATA_PATH).toString())
       for (const [username, { password, wins, loses }] of Object.entries(playerdata)) {
         if (!this.#players[username]) this.#players[username] = new Player(username, password)
-        Object.assign(this.#players[username], { wins, loses })
+        if (wins) this.#players[username].wins = wins
+        if (loses) this.#players[username].loses = loses
       }
     } catch (error) { }
   }

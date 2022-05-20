@@ -47,8 +47,7 @@ export class ClientSocket extends EventEmitter {
 
   #onPacket(packet: string) {
     const args = packet.split('|').map(e => {
-      const int = parseInt(e)
-      if (!isNaN(int)) return int
+      if (/^\-?\d+(\.\d+)?$/.test(e)) return Number(e)
       return e
     })
     const type = args.shift()
@@ -64,7 +63,6 @@ export class ClientSocket extends EventEmitter {
   }
 
   #onError(error: Error & { code: string }) {
-    if (error?.code === 'ECONNRESET') return
-    console.error(error)
+    if (error?.code !== 'ECONNRESET') console.error(error)
   }
 }

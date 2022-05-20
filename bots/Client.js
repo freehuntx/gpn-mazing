@@ -61,8 +61,7 @@ class Client extends EventEmitter {
 
   #onPacket(packet) {
     const args = packet.split('|').map(e => {
-      const int = Number(e)
-      if (Number.isSafeInteger(int)) return int
+      if (/^\-?\d+(\.\d+)?$/.test(e)) return Number(e)
       return e
     })
     const type = args.shift()
