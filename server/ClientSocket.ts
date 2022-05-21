@@ -48,6 +48,7 @@ export class ClientSocket extends EventEmitter {
     })
 
     this.#socket.on('close', () => this.disconnect())
+    this.#socket.on('end', () => this.disconnect())
     this.#socket.on('error', this.#onError.bind(this))
   }
 
