@@ -57,13 +57,12 @@ export class ClientSocket extends EventEmitter {
 
     this.#connected = false
     this.#socket?.destroy()
-    this.#socket?.removeAllListeners()
     this.#socket = undefined
     this.emit('disconnected')
   }
 
   send(type: string, ...args: any) {
-    if (!this.connected) return
+    if (!this.connected || !this.#socket || this.#socket.destroyed) return
     try {
       this.#socket?.write(`${[type, ...args].join('|')}\n`)
     }
