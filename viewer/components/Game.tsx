@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { useGame } from "../providers/Game"
 import { getColor } from "../../shared/contants/colors"
 
@@ -8,14 +8,28 @@ const roomSize = floorSize + wallSize
 
 export function Game() {
   const { game } = useGame()
+  const [offScreenCanvas] = useState<HTMLCanvasElement>(document.createElement('canvas'))
+  const [offScreenContext] = useState<CanvasRenderingContext2D>(offScreenCanvas.getContext('2d') as CanvasRenderingContext2D)
+  const [canvas, setCanvas] = useState<HTMLCanvasElement>()
+  const [canvasContext, setCanvasContext] = useState<CanvasRenderingContext2D>()
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    if (!canvasRef.current || !game) return
+    if (!canvasRef.current) {
+      setCanvasContext(undefined)
+      setCanvas(undefined)
+      return
+    }
 
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    const newCanvas = canvasRef.current 
+    setCanvas(newCanvas)
+
+    const newContext = canvasRef.current.getContext('2d')
+    if (newContext) setCanvasContext(newContext)
+  }, [canvasRef.current])
+
+  useEffect(() => {
+    if (!canvas || !offScreenContext || !canvasContext || !game) return
 
     const tickInterval = setInterval(() => {
       if (!canvas.parentElement) return
@@ -25,8 +39,9 @@ export function Game() {
         canvas.parentElement.clientHeight,
         canvas.parentElement.clientWidth
       )
-      canvas.width = canvasPixelSize
-      canvas.height = canvasPixelSize
+
+      offScreenCanvas.width = canvasPixelSize
+      offScreenCanvas.height = canvasPixelSize
 
       // Calculate view
       const view = (() => {
@@ -67,8 +82,8 @@ export function Game() {
       const factoredFloorSize = floorSize * view.factor
 
       // Clear frame
-      ctx.fillStyle = 'black'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      offScreenContext.fillStyle = 'black'
+      offScreenContext.fillRect(0, 0, canvas.width, canvas.height)
 
       // Render walls
       for (let { pos: { x, y }, top, right, bottom, left } of Object.values(game.walls)) {
@@ -79,27 +94,27 @@ export function Game() {
         
         const clearX = x + factoredHalfWallSize
         const clearY = y + factoredHalfWallSize
-        ctx.fillStyle = "white"
-        ctx.fillRect(x - factoredHalfWallSize, y - factoredHalfWallSize, factoredRoomSize + factoredWallSize, factoredRoomSize + factoredWallSize)
-        ctx.clearRect(clearX, clearY, factoredFloorSize, factoredFloorSize)
+        offScreenContext.fillStyle = "white"
+        offScreenContext.fillRect(x - factoredHalfWallSize, y - factoredHalfWallSize, factoredRoomSize + factoredWallSize, factoredRoomSize + factoredWallSize)
+        offScreenContext.clearRect(clearX, clearY, factoredFloorSize, factoredFloorSize)
 
-        if (!top) ctx.clearRect(clearX, clearY - factoredWallSize - 2, factoredFloorSize, factoredWallSize + 4)
-        if (!right) ctx.clearRect(clearX, clearY, factoredFloorSize + factoredWallSize + 4, factoredFloorSize)
-        if (!bottom) ctx.clearRect(clearX, clearY, factoredFloorSize, factoredFloorSize + factoredWallSize + 4)
-        if (!left) ctx.clearRect(clearX - factoredWallSize - 2, clearY, factoredWallSize + 4, factoredFloorSize)
+        if (!top) offScreenContext.clearRect(clearX, clearY - factoredWallSize - 2, factoredFloorSize, factoredWallSize + 4)
+        if (!right) offScreenContext.clearRect(clearX, clearY, factoredFloorSize + factoredWallSize + 4, factoredFloorSize)
+        if (!bottom) offScreenContext.clearRect(clearX, clearY, factoredFloorSize, factoredFloorSize + factoredWallSize + 4)
+        if (!left) offScreenContext.clearRect(clearX - factoredWallSize - 2, clearY, factoredWallSize + 4, factoredFloorSize)
       }
 
       // Render start
       let startX = (game.start.x - view.x) * factoredRoomSize + factoredFloorSize / 2
       let startY = (game.start.y - view.y) * factoredRoomSize + factoredFloorSize / 2
-      ctx.fillStyle = 'green'
-      ctx.fillRect(startX, startY, 10, 10)
+      offScreenContext.fillStyle = 'green'
+      offScreenContext.fillRect(startX, startY, 10, 10)
 
       // Render goal
       let goalX = (game.goal.x - view.x) * factoredRoomSize + factoredFloorSize / 2
       let goalY = (game.goal.y - view.y) * factoredRoomSize + factoredFloorSize / 2
-      ctx.fillStyle = 'red'
-      ctx.fillRect(goalX, goalY, 10, 10)
+      offScreenContext.fillStyle = 'red'
+      offScreenContext.fillRect(goalX, goalY, 10, 10)
 
       // Render players
       const playerEntries = Object.entries(game.players)
@@ -116,45 +131,50 @@ export function Game() {
         const playerRadius = factoredFloorSize * 0.4
         const textHeight = 18
         
-        ctx.font = `bold ${textHeight}px serif`
-        const nameMetrics = ctx.measureText(username)
+        offScreenContext.font = `bold ${textHeight}px serif`
+        const nameMetrics = offScreenContext.measureText(username)
 
         const nameX = x - nameMetrics.width / 2 - 10
         const nameY = y - textHeight * 3 - 5
 
 
         // Draw name box
-        ctx.fillStyle = playerColor
-        ctx.strokeStyle = 'black'
-        ctx.lineWidth = 2
-        ctx.rect(nameX, nameY, nameMetrics.width + 10, textHeight + 10)
-        ctx.fill()
-        ctx.stroke()
+        offScreenContext.fillStyle = playerColor
+        offScreenContext.strokeStyle = 'black'
+        offScreenContext.lineWidth = 2
+        offScreenContext.rect(nameX, nameY, nameMetrics.width + 10, textHeight + 10)
+        offScreenContext.fill()
+        offScreenContext.stroke()
 
         // Draw player name
-        ctx.textBaseline = 'top'
-        ctx.fillStyle = 'black'
-        ctx.fillText(username, nameX + 5, nameY + 5)
+        offScreenContext.textBaseline = 'top'
+        offScreenContext.fillStyle = 'black'
+        offScreenContext.fillText(username, nameX + 5, nameY + 5)
 
         // Draw player circle
-        ctx.fillStyle = playerColor
-        ctx.beginPath()
-        ctx.arc(x, y, playerRadius, 0, 2 * Math.PI, false);
-        ctx.fill()
+        offScreenContext.fillStyle = playerColor
+        offScreenContext.beginPath()
+        offScreenContext.arc(x, y, playerRadius, 0, 2 * Math.PI, false);
+        offScreenContext.fill()
 
         if (chat) {
-          ctx.fillStyle = 'white'
-          ctx.fillRect(x  - 10, y + factoredRoomSize - 20, ctx.measureText(chat).width + 20, 40)
-          ctx.fillStyle = 'black'
-          ctx.fillText(chat, x, y + factoredRoomSize)
+          offScreenContext.fillStyle = 'white'
+          offScreenContext.fillRect(x  - 10, y + factoredRoomSize - 20, offScreenContext.measureText(chat).width + 20, 40)
+          offScreenContext.fillStyle = 'black'
+          offScreenContext.fillText(chat, x, y + factoredRoomSize)
         }
       }
+
+      // Now push the rendering to real canvas
+      canvas.width = offScreenCanvas.width
+      canvas.height = offScreenCanvas.height
+      canvasContext.drawImage(offScreenCanvas, 0, 0)
     }, 1000 / 30)
 
     return () => {
       clearInterval(tickInterval)
     }
-  }, [canvasRef.current, game])
+  }, [offScreenContext, canvasContext, game])
 
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%' }}>
