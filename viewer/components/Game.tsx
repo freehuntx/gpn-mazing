@@ -92,6 +92,7 @@ export function Game() {
       // Render players
       const playerEntries = Object.entries(game.players)
       for (let i = 0; i < playerEntries.length; i++) {
+        const playerColor = getColor(i)
         let [username, { pos: { x, y }, chat }] = playerEntries[i]
         x -= view.x
         y - view.y
@@ -111,7 +112,7 @@ export function Game() {
 
 
         // Draw name box
-        ctx.fillStyle = getColor(i)
+        ctx.fillStyle = playerColor
         ctx.strokeStyle = 'black'
         ctx.lineWidth = 2
         ctx.rect(nameX, nameY, nameMetrics.width + 10, textHeight + 10)
@@ -124,7 +125,7 @@ export function Game() {
         ctx.fillText(username, nameX + 5, nameY + 5)
 
         // Draw player circle
-        ctx.fillStyle = getColor(i)
+        ctx.fillStyle = playerColor
         ctx.beginPath()
         ctx.arc(x, y, playerRadius, 0, 2 * Math.PI, false);
         ctx.fill()
