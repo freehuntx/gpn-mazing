@@ -69,6 +69,7 @@ export class ClientSocket extends EventEmitter {
     }
     catch (error) {
       console.error(error)
+      this.disconnect()
     }
   }
 
