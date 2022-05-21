@@ -4,12 +4,14 @@ import { createMaze, Maze } from './util/maze'
 import { MultiElo } from 'multi-elo'
 
 export interface GameState {
+  id: string
   players: Record<string, PlayerState>
   walls: Record<string, { pos: Vec2 } & WallInfo>
   goal: Vec2
 }
 
 export class Game extends EventEmitter {
+  #id: string
   #maze: Maze
   #players: Player[] = []
 
@@ -18,9 +20,11 @@ export class Game extends EventEmitter {
   constructor(difficulty: number) {
     super()
 
+    this.#id = Math.random().toString(32).slice(2)
     this.#maze = createMaze(difficulty)
 
     this.#state = {
+      id: this.#id,
       players: {},
       walls: {},
       goal: this.#maze.goal
@@ -30,6 +34,7 @@ export class Game extends EventEmitter {
     this.on('end', () => clearInterval(tickInterval))
   }
 
+  get id(): string { return this.#id }
   get state(): GameState { return this.#state }
 
   addPlayer(player: Player) {

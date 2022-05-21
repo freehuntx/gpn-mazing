@@ -127,7 +127,7 @@ export function Game() {
       <canvas ref={canvasRef} style={{
         margin: 'auto',
         backgroundSize: 'cover',
-        backgroundImage: `url(https://thiscatdoesnotexist.com/)`
+        backgroundImage: `url(https://thiscatdoesnotexist.com/?rand=${game?.id})`
       }}></canvas>
     </div>
   )

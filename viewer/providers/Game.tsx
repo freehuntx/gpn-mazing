@@ -7,6 +7,7 @@ type Wall = { pos: Vec2; top: boolean; right: boolean; bottom: boolean; left: bo
 type ChartData = Record<string, any>[]
 
 type Game = {
+  id: string
   players: Record<string, { pos: Vec2; chat?: string }>
   walls: Record<string, Wall>
 }
