@@ -4,6 +4,7 @@ import { afkTimeout, maxPackets } from '../shared/contants/common'
 
 export class ClientSocket extends EventEmitter {
   #connected = false
+  #ip: string
   #socket?: Socket
   #recvBuffer = ''
   #recvPacketCount = 0
@@ -12,6 +13,8 @@ export class ClientSocket extends EventEmitter {
     super()
     this.#connected = true
     this.#socket = socket
+    // FIXME: Add disconnect if no ip could be get?
+    this.#ip = socket.remoteAddress || ''
 
     // We expect the user to send atleast every 10 seconds some data. Otherwise he is afk
     let dataTimeout: any
@@ -52,13 +55,14 @@ export class ClientSocket extends EventEmitter {
     this.#socket.on('error', this.#onError.bind(this))
   }
 
-  get connected(): boolean { return !!this.#socket && !this.#socket.connecting && !this.#socket.destroyed && this.#connected }
-  get ip(): string { return this.#socket?.remoteAddress || '' }
+  get connected(): boolean { return this.#connected }
+  get ip(): string { return this.#ip }
 
   disconnect() {
     if (!this.#connected) return
 
     this.#connected = false
+    this.#socket?.end()
     this.#socket?.destroy()
     this.#socket = undefined
     this.emit('disconnected')
