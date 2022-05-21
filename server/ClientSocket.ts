@@ -1,5 +1,6 @@
 import { Socket } from 'net'
 import { EventEmitter } from 'events'
+import { afkTimeout, maxPackets } from '../shared/contants/common'
 
 export class ClientSocket extends EventEmitter {
   #connected = false
@@ -16,10 +17,10 @@ export class ClientSocket extends EventEmitter {
     let dataTimeout: any
 
     this.#socket.on('data', chunk => {
-      // More than 10 packets per second can be considered as spam.
+      // More than x packets per second can be considered as spam.
       // Increase packet recv counter by 1 and check if its above 10
-      if (this.#recvPacketCount++ > 10) {
-        return this.sendError('Dont spam me! Max 10 packets per second!', true)
+      if (this.#recvPacketCount++ > maxPackets) {
+        return this.sendError(`Dont spam me! Max ${maxPackets} packets per second!`, true)
       }
 
       // After a second reduce the packet counter again
@@ -29,8 +30,8 @@ export class ClientSocket extends EventEmitter {
 
       clearTimeout(dataTimeout)
       dataTimeout = setTimeout(() => {
-        return this.sendError('Not active since 10 seconds. BB!', true)
-      }, 10000)
+        return this.sendError('You are kicked because afk', true)
+      }, afkTimeout)
 
       this.#recvBuffer += chunk.toString()
 

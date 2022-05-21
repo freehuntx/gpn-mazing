@@ -1,7 +1,8 @@
 import { EventEmitter } from 'events'
+import { MultiElo } from 'multi-elo'
 import { Player, PlayerAction, PlayerState } from "./Player"
 import { createMaze, Maze } from './util/maze'
-import { MultiElo } from 'multi-elo'
+import { tickrate } from '../shared/contants/common'
 
 export interface GameState {
   id: string
@@ -32,7 +33,7 @@ export class Game extends EventEmitter {
       walls: {}
     }
 
-    const tickInterval = setInterval(() => this.#onTick(), 1000 / 3)
+    const tickInterval = setInterval(() => this.#onTick(), 1000 / tickrate)
     this.on('end', () => clearInterval(tickInterval))
   }
 
