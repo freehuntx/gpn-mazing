@@ -36,7 +36,7 @@ export function GameProvider({ children }: { children: React.ReactElement }) {
   useEffect(() => {
     const client = new WsStateClient(4001)
 
-    client.on('update', () => {
+    client.on('update', (path) => {
       setServerInfoList(client.state.serverInfoList)
       setScoreboard(client.state.scoreboard)
       setLastWinners(client.state.lastWinners)

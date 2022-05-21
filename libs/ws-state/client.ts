@@ -13,6 +13,32 @@ export class WsStateClient extends EventEmitter {
       this.#state = newState
       this.emit('update')
     })
+
+    this.#socket.on('set', (path, value) => {
+      const realPath = path.slice(0, -1)
+      const key = path.slice(-1).pop()
+      let target = this.#state
+
+      if (realPath.length > 0) {
+        target = realPath.reduce((a: any, e: string) => a[e], target)
+      }
+
+      target[key] = value
+      this.emit('update', path)
+    })
+
+    this.#socket.on('delete', (path) => {
+      const realPath = path.slice(0, -1)
+      const key = path.slice(-1).pop()
+      let target = this.#state
+
+      if (realPath.length > 0) {
+        target = realPath.reduce((a: any, e: string) => a[e], target)
+      }
+
+      delete target[key]
+      this.emit('update', path)
+    })
   }
 
   get state(): any { return this.#state }

@@ -18,12 +18,12 @@ export class WsStateServer<StateType> {
     this.#state = new DeepProxy(initial, {
       set: (target: any, path: any, value: any) => {
         target[path[path.length - 1]] = value
-        this.#io.emit('update', this.#state)
+        this.#io.emit('set', path, value)
         return true
       },
       deleteProperty: (target: any, path: any) => {
         delete target[path[path.length - 1]]
-        this.#io.emit('update', this.#state)
+        this.#io.emit('delete', path)
         return true
       }
     }) as unknown as StateType
