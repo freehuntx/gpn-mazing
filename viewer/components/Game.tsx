@@ -66,7 +66,8 @@ export function Game() {
       const factoredFloorSize = floorSize * view.factor
 
       // Clear frame
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      ctx.fillStyle = 'black'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
 
       // Render walls
       for (let { pos: { x, y }, top, right, bottom, left } of Object.values(game.walls)) {
@@ -122,6 +123,12 @@ export function Game() {
   }, [canvasRef.current, game])
 
   return (
-    <canvas ref={canvasRef} style={{ display: 'flex', margin: 'auto' }}></canvas>
+    <div style={{ display: 'flex', width: '100%', height: '100%' }}>
+      <canvas ref={canvasRef} style={{
+        margin: 'auto',
+        backgroundSize: 'cover',
+        backgroundImage: `url(https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg)`
+      }}></canvas>
+    </div>
   )
 }
