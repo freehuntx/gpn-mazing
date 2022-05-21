@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from "react"
 import { useGame } from "../providers/Game"
+import { getColor } from "../../shared/contants/colors"
 
 const wallSize = 2
 const floorSize = 16
 const roomSize = floorSize + wallSize
-const playerColors = ['red', 'green', 'blue', 'orange', 'yellow', 'violet']
 
 export function Game() {
   const { game } = useGame()
@@ -63,6 +63,7 @@ export function Game() {
       const factoredRoomSize = roomSize * view.factor
       const factoredWallSize = wallSize * view.factor
       const factoredHalfWallSize = factoredWallSize / 2
+      const factoredHalfRoomSize = factoredRoomSize / 2
       const factoredFloorSize = floorSize * view.factor
 
       // Clear frame
@@ -89,7 +90,6 @@ export function Game() {
       }
 
       // Render players
-      ctx.font = '12px serif'
       const playerEntries = Object.entries(game.players)
       for (let i = 0; i < playerEntries.length; i++) {
         let [username, { pos: { x, y }, chat }] = playerEntries[i]
@@ -97,15 +97,37 @@ export function Game() {
         y - view.y
         x *= factoredRoomSize
         y *= factoredRoomSize
+        x += factoredHalfRoomSize
+        y += factoredHalfRoomSize
 
-        const playerRadius = factoredFloorSize * 0.2
-        ctx.fillStyle = playerColors[i % (playerColors.length - 1)]
+        const playerRadius = factoredFloorSize * 0.4
+        const textHeight = 18
+        
+        ctx.font = `bold ${textHeight}px serif`
+        const nameMetrics = ctx.measureText(username)
 
-        ctx.beginPath()
-        ctx.arc(x + factoredFloorSize * 0.5, y + factoredFloorSize * 0.5 + 1, playerRadius, 0, 2 * Math.PI, false);
+        const nameX = x - nameMetrics.width / 2 - 10
+        const nameY = y - textHeight * 3 - 5
+
+
+        // Draw name box
+        ctx.fillStyle = getColor(i)
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 2
+        ctx.rect(nameX, nameY, nameMetrics.width + 10, textHeight + 10)
         ctx.fill()
+        ctx.stroke()
 
-        ctx.fillText(username, x, y, factoredRoomSize)
+        // Draw player name
+        ctx.textBaseline = 'top'
+        ctx.fillStyle = 'black'
+        ctx.fillText(username, nameX + 5, nameY + 5)
+
+        // Draw player circle
+        ctx.fillStyle = getColor(i)
+        ctx.beginPath()
+        ctx.arc(x, y, playerRadius, 0, 2 * Math.PI, false);
+        ctx.fill()
 
         if (chat) {
           ctx.fillStyle = 'white'
