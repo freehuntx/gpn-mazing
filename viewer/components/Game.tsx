@@ -127,7 +127,7 @@ export function Game() {
       <canvas ref={canvasRef} style={{
         margin: 'auto',
         backgroundSize: 'cover',
-        backgroundImage: `url(https://upload.wikimedia.org/wikipedia/commons/3/3a/Cat03.jpg)`
+        backgroundImage: `url(https://thiscatdoesnotexist.com/)`
       }}></canvas>
     </div>
   )
