@@ -4,8 +4,6 @@ import {
   Line,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
   Legend
 } from 'recharts'
 import { useGame } from '../providers/Game'
@@ -14,12 +12,12 @@ import { getColor } from '../../shared/contants/colors'
 export function Scoreboard() {
   const { chartData, scoreboard } = useGame()
 
-  const lines = {};
+  const lines: Record<string, any> = {};
   chartData.forEach((point) => {
     Object.keys(point).forEach((key, index) => {
-      if (lines[key] || key === "name") return;
+      if (key === "name") return;
       lines[key] = {
-        dataKey: key,
+        key,
         stroke: getColor(index)
       };
     });
@@ -68,13 +66,11 @@ export function Scoreboard() {
           bottom: 5
         }}
       >
-        {/*<CartesianGrid strokeDasharray="3 3" />*/}
         <XAxis dataKey="name" />
         <YAxis />
-        {/*<Tooltip />*/}
         <Legend />
-        {Object.values(lines).map(({ dataKey, stroke }) => (
-          <Line key={dataKey} type="monotone" dataKey={dataKey} stroke={stroke} />
+        {Object.values(lines).map(({ key, stroke }) => (
+          <Line key={key} dot={false} dataKey={key} stroke={stroke} />
         ))}
       </LineChart>
     </>
