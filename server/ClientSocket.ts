@@ -10,7 +10,7 @@ export class ClientSocket extends EventEmitter {
 
   constructor(socket: Socket) {
     super()
-    this.#connected = !!socket && !socket.connecting && !socket.destroyed
+    this.#connected = true
     this.#socket = socket
 
     // We expect the user to send atleast every 10 seconds some data. Otherwise he is afk
