@@ -130,7 +130,7 @@ export function Game() {
         left: canvasRef.current ? canvasRef.current.offsetLeft + 'px' : 0,
         width: canvasRef.current ? canvasRef.current.width + 'px' : 0,
         height: canvasRef.current ? canvasRef.current.height + 'px' : 0,
-        opacity: 0.6,
+        opacity: 0.5,
         backgroundSize: 'cover',
         backgroundImage: `url(https://thiscatdoesnotexist.com/?rand=${game?.id})`
       }}>
