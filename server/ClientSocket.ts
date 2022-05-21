@@ -56,7 +56,6 @@ export class ClientSocket extends EventEmitter {
     if (!this.#connected) return
 
     this.#connected = false
-    this.#socket?.removeAllListeners()
     this.#socket?.destroy()
     this.#socket = undefined
     this.emit('disconnected')
