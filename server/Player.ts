@@ -159,6 +159,7 @@ export class Player extends EventEmitter {
 
   #onDisconnect() {
     if (this.#game) this.leaveGame()
+    this.#socket?.removeAllListeners()
     this.#socket = undefined
     this.#chatMessage = undefined
     this.#action = PlayerAction.NONE
