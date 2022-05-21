@@ -5,9 +5,10 @@ import { MultiElo } from 'multi-elo'
 
 export interface GameState {
   id: string
+  start: Vec2
+  goal: Vec2
   players: Record<string, PlayerState>
   walls: Record<string, { pos: Vec2 } & WallInfo>
-  goal: Vec2
 }
 
 export class Game extends EventEmitter {
@@ -25,9 +26,10 @@ export class Game extends EventEmitter {
 
     this.#state = {
       id: this.#id,
+      start: this.#maze.start,
+      goal: this.#maze.goal,
       players: {},
-      walls: {},
-      goal: this.#maze.goal
+      walls: {}
     }
 
     const tickInterval = setInterval(() => this.#onTick(), 1000 / 3)

@@ -89,6 +89,18 @@ export function Game() {
         if (!left) ctx.clearRect(clearX - factoredWallSize - 2, clearY, factoredWallSize + 4, factoredFloorSize)
       }
 
+      // Render start
+      let startX = (game.start.x - view.x) * factoredRoomSize + factoredFloorSize / 2
+      let startY = (game.start.y - view.y) * factoredRoomSize + factoredFloorSize / 2
+      ctx.fillStyle = 'green'
+      ctx.fillRect(startX, startY, 10, 10)
+
+      // Render goal
+      let goalX = (game.goal.x - view.x) * factoredRoomSize + factoredFloorSize / 2
+      let goalY = (game.goal.y - view.y) * factoredRoomSize + factoredFloorSize / 2
+      ctx.fillStyle = 'red'
+      ctx.fillRect(goalX, goalY, 10, 10)
+
       // Render players
       const playerEntries = Object.entries(game.players)
       for (let i = 0; i < playerEntries.length; i++) {

@@ -8,6 +8,8 @@ type ChartData = Record<string, any>[]
 
 type Game = {
   id: string
+  start: Vec2
+  goal: Vec2
   players: Record<string, { pos: Vec2; chat?: string }>
   walls: Record<string, Wall>
 }
