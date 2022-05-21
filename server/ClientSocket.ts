@@ -52,6 +52,7 @@ export class ClientSocket extends EventEmitter {
   }
 
   get connected(): boolean { return !!this.#socket && !this.#socket.connecting && !this.#socket.destroyed && this.#connected }
+  get ip(): string { return this.#socket?.remoteAddress || '' }
 
   disconnect() {
     if (!this.#connected) return

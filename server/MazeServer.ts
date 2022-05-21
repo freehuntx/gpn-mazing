@@ -6,6 +6,7 @@ import { WsStateServer } from '../libs/ws-state/server'
 import { ClientSocket } from './ClientSocket'
 import { Player } from './Player'
 import { Game, GameState } from './Game'
+import { maxConnections } from '../shared/contants/common'
 
 const GAME_DATA_PATH = os.tmpdir() + '/gpn-mazing-data.json'
 const HOSTNAMES = Object.values(os.networkInterfaces())
@@ -37,6 +38,7 @@ export class MazeServer extends EventEmitter {
   #game?: Game // Game instance (if a game is active)
   #players: Record<string, Player> = {} // Map of players. Key=username, Value=player
   #difficulty = 2
+  #connectionIpmap: Record<string, number> = {}
 
   constructor(gamePort: number, viewPort: number) {
     super()
@@ -204,6 +206,19 @@ export class MazeServer extends EventEmitter {
    */
   async #onSocket(socket: Socket) {
     const clientSocket = new ClientSocket(socket) // Lets create a ClientSocket instance which has alot of useful functions
+
+    if (!this.#connectionIpmap[clientSocket.ip]) this.#connectionIpmap[clientSocket.ip] = 0
+    this.#connectionIpmap[clientSocket.ip]++
+
+    clientSocket.on('disconnected', () => {
+      this.#connectionIpmap[clientSocket.ip]--
+    })
+
+    if (this.#connectionIpmap[clientSocket.ip] > maxConnections) {
+      return clientSocket.sendError('Max connections reached', true)
+    }
+
+
 
     clientSocket.send('motd', 'You can find the protocol documentation here: https://github.com/freehuntx/gpn-mazing/blob/master/PROTOCOL.md')
 
