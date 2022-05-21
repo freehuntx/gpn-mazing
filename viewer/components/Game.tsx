@@ -75,7 +75,6 @@ export function Game() {
         y -= view.y
         x *= factoredRoomSize
         y *= factoredRoomSize
-        ctx.fillStyle = "white"
         
         const clearX = x + factoredHalfWallSize
         const clearY = y + factoredHalfWallSize
@@ -124,10 +123,21 @@ export function Game() {
 
   return (
     <div style={{ display: 'flex', width: '100%', height: '100%' }}>
-      <canvas ref={canvasRef} style={{
-        margin: 'auto',
+      <div style={{
+        position: 'absolute',
+        zIndex: 0,
+        top: canvasRef.current ? canvasRef.current.offsetTop + 'px' : 0,
+        left: canvasRef.current ? canvasRef.current.offsetLeft + 'px' : 0,
+        width: canvasRef.current ? canvasRef.current.width + 'px' : 0,
+        height: canvasRef.current ? canvasRef.current.height + 'px' : 0,
+        opacity: 0.6,
         backgroundSize: 'cover',
         backgroundImage: `url(https://thiscatdoesnotexist.com/?rand=${game?.id})`
+      }}>
+      </div>
+      <canvas ref={canvasRef} style={{
+        margin: 'auto',
+        zIndex: 1,
       }}></canvas>
     </div>
   )
