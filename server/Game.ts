@@ -39,6 +39,7 @@ export class Game extends EventEmitter {
 
   get id(): string { return this.#id }
   get state(): GameState { return this.#state }
+  get maze(): Maze { return this.#maze }
 
   addPlayer(player: Player) {
     if (this.#players.includes(player)) {
@@ -49,7 +50,6 @@ export class Game extends EventEmitter {
     this.#players.push(player)
     this.#state.players[player.username] = player.state
 
-    player.send('goal', this.#maze.goal.x, this.#maze.goal.y)
     this.#updatePlayerPosition(player, this.#maze.start.x, this.#maze.start.y)
   }
 

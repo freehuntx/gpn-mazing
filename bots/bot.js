@@ -16,7 +16,9 @@ client.on('packet', (type, ...args) => {
     return
   }
 
-  if (type === 'goal') {
+  if (type === 'goal') {}
+
+  if (type === 'game') {
     decisions = {}
   }
 

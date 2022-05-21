@@ -3,6 +3,8 @@ import generator from 'generate-maze'
 export type WallsMap = Record<string, Record<string, WallInfo>>
 
 export type Maze = {
+  width: number
+  height: number
   walls: WallsMap
   start: Vec2
   goal: Vec2
@@ -24,5 +26,5 @@ export function createMaze(difficulty: number): Maze {
   const start = { x: startX, y: height - 1 }
   const goal = { x: goalX, y: 0 }
 
-  return { walls, start, goal }
+  return { width, height, walls, start, goal }
 }

@@ -17,7 +17,9 @@ for (let i=0; i<10; i++) {
       return
     }
   
-    if (type === 'goal') {
+    if (type === 'goal') {}
+
+    if (type === 'game') {
       decisions = {}
     }
   

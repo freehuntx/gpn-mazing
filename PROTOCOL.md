@@ -48,8 +48,23 @@ The error packet is sent by the server if something went wrong.
 
 **Example:** `error|INVALID_USERNAME`
 
+### game
+The game packet is sent by the server to inform the client about the current running game.  
+It contains information about the map size and the goal position.
+
+**Name:** game  
+**Sender:** Server  
+**Arguments:**  
+| # | Type   | Description                   |
+|---|--------|-------------------------------|
+| 1 | Number | The width of the current map  |
+| 2 | Number | The height of the current map |
+| 3 | Number | The x position of the goal    |
+| 4 | Number | The y position of the goal    |
+
 ### goal
-The goal packet is sent by the server to inform the client about the goal position.
+The goal packet is sent by the server to inform the client about the goal position.  
+Note: This is deprecated. Use game packet instead
 
 **Name:** goal  
 **Sender:** Server  

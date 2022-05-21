@@ -87,6 +87,9 @@ export class Player extends EventEmitter {
     if (this.#game) this.leaveGame()
     this.#game = game
     this.#game.addPlayer(this)
+    
+    this.send('goal', game.maze.goal.x, game.maze.goal.y) // Deprecated
+    this.send('game', game.maze.width, game.maze.height, game.maze.goal.x, game.maze.goal.y)
   }
 
   leaveGame() {
