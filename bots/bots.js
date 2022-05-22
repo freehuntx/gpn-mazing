@@ -3,7 +3,7 @@ const { Client } = require('./Client')
 const username = process.argv[2] || '<Your Username>'
 const password = process.argv[3] || '<Your Password>'
 
-for (let i=0; i<10; i++) {
+for (let i=0; i<5; i++) {
   const client = new Client('127.0.0.1', 4000, username + i, password)
   let decisions = {}
   

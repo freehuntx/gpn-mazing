@@ -21,10 +21,12 @@ export function createMaze(difficulty: number): Maze {
   })
 
   const startX = Math.floor(Math.random() * width)
+  const startY = height - (difficulty < 4 ? 1 : 2)
   const goalX = width - startX - 1
+  const goalY = difficulty < 4 ? 0 : 1
 
-  const start = { x: startX, y: height - 1 }
-  const goal = { x: goalX, y: 0 }
+  const start = { x: startX, y: startY }
+  const goal = { x: goalX, y: goalY }
 
   return { width, height, walls, start, goal }
 }
