@@ -6,6 +6,8 @@ import { tickrate } from '../shared/contants/common'
 
 export interface GameState {
   id: string
+  width: number
+  height: number
   start: Vec2
   goal: Vec2
   players: Record<string, PlayerState>
@@ -27,6 +29,8 @@ export class Game extends EventEmitter {
 
     this.#state = {
       id: this.#id,
+      width: this.#maze.width,
+      height: this.#maze.height,
       start: this.#maze.start,
       goal: this.#maze.goal,
       players: {},

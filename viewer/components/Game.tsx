@@ -45,31 +45,31 @@ export function Game() {
 
       // Calculate view
       const view = (() => {
-        let lowestX = 0, lowestY = 0
-        let highestX = 0, highestY = 0
+        //let lowestX = 0, lowestY = 0
+        //let highestX = 0, highestY = 0
 
         // Get size info by walls
-        for (const { pos: { x, y } } of Object.values(game.walls)) {
-          lowestX = Math.min(lowestX, x)
-          lowestY = Math.min(lowestY, y)
-          highestX = Math.max(highestX, x)
-          highestY = Math.max(highestY, y)
-        }
+        //for (const { pos: { x, y } } of Object.values(game.walls)) {
+        //  lowestX = Math.min(lowestX, x)
+        //  lowestY = Math.min(lowestY, y)
+        //  highestX = Math.max(highestX, x)
+        //  highestY = Math.max(highestY, y)
+        //}
 
         // Increase by one  to get the proper width/height
-        highestX++
-        highestY++
+        //highestX++
+        //highestY++
 
-        const width = Math.abs(highestX - lowestX)
-        const height = Math.abs(highestY - lowestY)
-        const size = Math.max(width, height)
+        //const width = Math.abs(highestX - lowestX)
+        //const height = Math.abs(highestY - lowestY)
+        const size = Math.max(game.width, game.height)
         const pixelSize = size * roomSize
         const factor = canvasPixelSize / pixelSize
 
         return {
           //width, height, size,
-          x: lowestX,
-          y: lowestY,
+          x: 0,
+          y: 0,
           //pixelSize,
           factor
         }
