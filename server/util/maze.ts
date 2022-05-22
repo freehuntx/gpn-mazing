@@ -17,7 +17,7 @@ enum Moves {
   LEFT
 }
 
-export function createMaze(difficulty: number): Maze {
+export function createMaze2(difficulty: number): Maze {
   const width = difficulty
   const height = difficulty
   const walls: WallsMap = {}
@@ -106,7 +106,7 @@ export function createMaze(difficulty: number): Maze {
   return { width, height, walls, start: goal, goal: start }
 }
 
-export function createMaze2(difficulty: number): Maze {
+export function createMaze(difficulty: number): Maze {
   const width = difficulty
   const height = difficulty
   const walls: WallsMap = {}
