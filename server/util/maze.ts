@@ -103,7 +103,7 @@ export function createMaze(difficulty: number): Maze {
     }
   }
 
-  return { width, height, walls, start, goal }
+  return { width, height, walls, start: goal, goal: start }
 }
 
 export function createMaze2(difficulty: number): Maze {
