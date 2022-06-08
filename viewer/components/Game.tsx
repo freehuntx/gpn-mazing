@@ -142,6 +142,7 @@ export function Game() {
         offScreenContext.fillStyle = playerColor
         offScreenContext.strokeStyle = 'black'
         offScreenContext.lineWidth = 2
+        offScreenContext.beginPath()
         offScreenContext.rect(nameX, nameY, nameMetrics.width + 10, textHeight + 10)
         offScreenContext.fill()
         offScreenContext.stroke()
